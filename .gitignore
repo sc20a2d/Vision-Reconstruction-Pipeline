@@ -1,3 +1,8 @@
+# Participant data and spike image classifier
+participants_data_v2021/
+AlgonautsVideos268_All_30fpsmax/
+Spike-Image-Decoder/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
