@@ -1,3 +1,22 @@
+import os
+import matplotlib
+matplotlib.use('Agg')
+import numpy as np
+import keras
+from keras.models import Sequential, Model
+from keras.layers import *
+from keras import backend as K
+import pdb
+import matplotlib
+from matplotlib import pyplot as plt
+import sys
+import skimage
+import skimage.measure
+from scipy.io import loadmat
+from sklearn import preprocessing
+import cv2
+import tensorflow as tf
+
 import glob
 import numpy as np
 import urllib
@@ -25,6 +44,17 @@ from nilearn import surface
 from decord import VideoReader
 from decord import cpu
 
+# np.random.seed(1)
+# set_random_seed(2)
+
+# Resize to resolution
+resolution = 64
+ncell = 64
+
+
+SID_import = __import__("Spike-Image-Decoder.SID")
+SID = getattr(SID_import, "SID")
+
 
 #@title Utility functions for data loading
 def save_dict(di_, filename_):
@@ -38,52 +68,8 @@ def load_dict(filename_):
         ret_di = u.load()
     return ret_di
 
-def visualize_activity(vid_id,sub):
-  fmri_dir = './participants_data_v2021' 
-  track = "full_track"
-  results_dir = '/content/'
-  track_dir = os.path.join(fmri_dir, track) 
-  sub_fmri_dir = os.path.join(track_dir, sub)
-  fmri_train_all,voxel_mask = get_fmri(sub_fmri_dir,"WB") 
-  visual_mask_3D = np.zeros((78,93,71))
-  visual_mask_3D[voxel_mask==1]= fmri_train_all[vid_id,:]
-  brain_mask = '/content/example.nii'
-  nii_save_path =  os.path.join(results_dir, 'vid_activity.nii')
-  saveasnii(brain_mask,nii_save_path,visual_mask_3D)
-  plotting.plot_glass_brain(nii_save_path,
-                          title='fMRI response',plot_abs=False,
-                          display_mode='lyr',colorbar=True)
 
-def get_activations(activations_dir, layer_name):
-    """This function loads neural network features/activations (preprocessed using PCA) into a
-    numpy array according to a given layer.
-    Parameters
-    ----------
-    activations_dir : str
-        Path to PCA processed Neural Network features
-    layer_name : str
-        which layer of the neural network to load,
-    Returns
-    -------
-    train_activations : np.array
-        matrix of dimensions #train_vids x #pca_components
-        containing activations of train videos
-    test_activations : np.array
-        matrix of dimensions #test_vids x #pca_components
-        containing activations of test videos
-    """
-
-    train_file = os.path.join(activations_dir,"train_" + layer_name + ".npy")
-    test_file = os.path.join(activations_dir,"test_" + layer_name + ".npy")
-    train_activations = np.load(train_file)
-    test_activations = np.load(test_file)
-    scaler = StandardScaler()
-    train_activations = scaler.fit_transform(train_activations)
-    test_activations = scaler.fit_transform(test_activations)
-
-    return train_activations, test_activations
-
-def get_fmri(fmri_dir, ROI):
+def get_fmri(fmri_dir, ROI) -> np.ndarray:
     """This function loads fMRI data into a numpy array for to a given ROI.
     Parameters
     ----------
@@ -111,7 +97,129 @@ def get_fmri(fmri_dir, ROI):
 
     return ROI_data_train
 
-def saveasnii(brain_mask,nii_save_path,nii_data):
-    img = nib.load(brain_mask)
-    nii_img = nib.Nifti1Image(nii_data, img.affine, img.header)
-    nib.save(nii_img, nii_save_path)
+def get_frames_from_videos(file):
+    """This function takes a mp4 video file as input and returns
+    a list of uniformly sampled frames (PIL Image).
+    Parameters
+    ----------
+    file : str
+        path to mp4 video file
+    num_frames : int
+        how many frames to select using uniform frame sampling.
+    Returns
+    -------
+    images: list of PIL Images
+    num_frames: int
+        number of frames extracted
+    """
+    images = []
+    number_of_files = 1000
+    for video_index in range(number_of_files):
+        vr = cv2.VideoCapture(file[video_index])
+        _, frame = vr.read()
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        images.append(cv2.resize(gray_frame, (resolution, resolution)))
+        vr.release()
+    return np.array(images)
+
+
+if __name__ == '__main__':
+    print("Imports Successful.")
+
+
+    fmri_data, mask = get_fmri("participants_data_v2021/full_track/sub01", "WB")
+    Y_test = np.array(fmri_data[0][:ncell])
+    Y_train = np.array(fmri_data[0][:ncell])
+
+    # print(fmri_data[0])
+
+    video_dir = 'AlgonautsVideos268_All_30fpsmax'
+    video_list = glob.glob(video_dir + '/*.mp4')
+    video_list.sort()
+
+    frames_data = get_frames_from_videos(video_list)
+    X_train = frames_data
+    X_test = frames_data
+
+    # X_train.reshape([X_train.shape[0], resolution, resolution, 1])
+    # X_test.reshape([X_test.shape[0], resolution, resolution, 1])
+
+    print(X_train.shape)
+
+    # tf.convert_to_tensor(X_train, dtype=tf.float32)
+    # tf.convert_to_tensor(X_test, dtype=tf.float32)
+    # tf.convert_to_tensor(Y_test, dtype=tf.float32)
+    # tf.convert_to_tensor(Y_train, dtype=tf.float32)
+
+
+    # X_train = np.asarray(X_train).astype(np.float32)
+    # X_test = np.asarray(X_test).astype(np.float32)
+    # Y_train = np.asarray(Y_train).astype(np.float32)
+    # Y_test = np.asarray(Y_test).astype(np.float32)
+
+
+    input_x = Input(shape = (ncell,))
+
+    model_dense = SID.dense_decoder(ncell)
+    model_ae = SID.AE((resolution, resolution, 1))
+
+    dense_out = model_dense(input_x)
+    ae_out = model_ae(dense_out)
+
+    optimizer = keras.optimizers.Adam()
+
+
+    end2end_model = Model(input_x, ae_out)
+    end2end_model.summary()
+    end2end_model.compile(loss = 'mse', optimizer = optimizer)
+
+    weight_dir = 'e2e_model'
+    result_dir = 'e2e_result'
+
+    multiout_model = Model(input_x, [dense_out, ae_out])
+
+    for i in range(10):
+        end2end_model.fit(Y_train, X_train, batch_size = 10, epochs = 30, validation_data = (Y_test, X_test) )
+         
+        pred_dense, pred_ae = multiout_model.predict(Y_test)
+        mse, psnr, ssim = SID.cal_performance(X_test, pred_ae)
+        print('%dcell AE:\n\tmse:%f psnr:%f ssim:%f'%(ncell, mse, psnr, ssim))
+
+    if not os.path.exists(weight_dir):
+        os.mkdir(weight_dir)
+    if not os.path.exists(result_dir):
+        os.mkdir(result_dir)
+
+    end2end_model.save_weights(os.path.join(weight_dir, 'end2end_digit69_spk.h5'))
+
+
+    # if not os.path.exists(result_dir):
+    #    os.mkdir(result_dir)
+    np.save(os.path.join(result_dir, 'end2end_digit69_spk.npy'), pred_ae)
+    pred_dense_trn, pred_ae_trn = multiout_model.predict(Y_train)
+    np.save(os.path.join(result_dir, 'end2end_digit69_spk_trn.npy'), pred_ae_trn)
+    
+
+
+    # # visualization the reconstructed images
+    # X_reconstructed_mu = pred_ae
+    # n = 10
+    # for j in range(1):
+    #     plt.figure(figsize=(12, 2))    
+    #     for i in range(n):
+    #         # display original images
+    #         ax = plt.subplot(2, n, i +j*n*2 + 1)
+    #         plt.imshow(np.rot90(np.fliplr(X_test[i+j*n].reshape(resolution ,resolution ))),cmap='hot')
+    #         ax.get_xaxis().set_visible(False)
+    #         ax.get_yaxis().set_visible(False)
+    #         # display reconstructed images
+    #         ax = plt.subplot(2, n, i + n + j*n*2 + 1)
+    #         #plt.imshow(np.rot90(np.fliplr(X_reconstructed_mu[i+j*n].reshape(resolution ,resolution ))),cmap='hot')
+    #         plt.imshow(np.rot90(np.fliplr(X_reconstructed_mu[i+j*n].reshape(resolution ,resolution ))),cmap='hot')
+    #         ax.get_xaxis().set_visible(False)
+    #         ax.get_yaxis().set_visible(False)
+
+    #     plt.show()
+    #     plt.savefig('e2eRec_spk.png', dpi=300)
+
+    # plt.close()
