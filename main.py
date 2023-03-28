@@ -1,48 +1,23 @@
 import os
 import matplotlib
-matplotlib.use('Agg')
-import numpy as np
-import keras
-from keras.models import Sequential, Model
-from keras.layers import *
-from keras import backend as K
-import pdb
-import matplotlib
 from matplotlib import pyplot as plt
-import sys
+matplotlib.use('TkAgg')
+import numpy as np
+from tensorflow import keras
+
 import skimage
 import skimage.measure
-from scipy.io import loadmat
+import skimage.metrics
 from sklearn import preprocessing
 import cv2
 import tensorflow as tf
 
 import glob
-import numpy as np
-import urllib
-import torch
-import cv2
-import argparse
-import time
-import random
-import matplotlib.pyplot as plt
-import nibabel as nib
 import pickle
-from nilearn import plotting
-from tqdm import tqdm
-from torchvision import transforms as trn
-import os
+# from sklearn.decomposition import PCA, IncrementalPCA
 from PIL import Image
-from sklearn.preprocessing import StandardScaler
-from torch.autograd import Variable as V
-from sklearn.decomposition import PCA, IncrementalPCA
-import torch.nn as nn
-import torch.utils.model_zoo as model_zoo
-import torch.nn.functional as F
-from nilearn import datasets
-from nilearn import surface
-from decord import VideoReader
-from decord import cpu
+from sklearn.model_selection import train_test_split
+from keras import callbacks
 
 # np.random.seed(1)
 # set_random_seed(2)
