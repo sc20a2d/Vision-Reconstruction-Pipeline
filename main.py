@@ -19,12 +19,15 @@ from PIL import Image
 from sklearn.model_selection import train_test_split
 from keras import callbacks
 
-# np.random.seed(1)
-# set_random_seed(2)
+
+# Change to a random integer
+random_seed = 12345
+
+np.random.seed(random_seed)
+tf.random.set_seed(random_seed)
 
 # Resize to resolution
 resolution = 64
-ncell = 64
 
 
 SID_import = __import__("Spike-Image-Decoder.SID")
