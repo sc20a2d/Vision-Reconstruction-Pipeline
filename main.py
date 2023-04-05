@@ -75,30 +75,14 @@ def get_fmri(fmri_dir, ROI) -> np.ndarray:
 
     return ROI_data_train
 
-def get_frames_from_videos(file):
-    """This function takes a mp4 video file as input and returns
-    a list of uniformly sampled frames (PIL Image).
-    Parameters
-    ----------
-    file : str
-        path to mp4 video file
-    num_frames : int
-        how many frames to select using uniform frame sampling.
-    Returns
-    -------
-    images: list of PIL Images
-    num_frames: int
-        number of frames extracted
-    """
-    images = []
-    number_of_files = 1000
-    for video_index in range(number_of_files):
-        vr = cv2.VideoCapture(file[video_index])
-        _, frame = vr.read()
-        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        images.append(cv2.resize(gray_frame, (resolution, resolution)))
-        vr.release()
-    return np.array(images)
+    subj = format(subject_number, '02')
+    algo_dir = 'algonauts_2023_tutorial_data'
+    data_dir = os.path.join(algo_dir, 'subj'+subj)
+    fmri_dir = os.path.join(data_dir, 'training_split', 'training_fmri')
+    lh_fmri = np.load(os.path.join(fmri_dir, 'lh_training_fmri.npy'))
+    rh_fmri = np.load(os.path.join(fmri_dir, 'rh_training_fmri.npy'))
+    train_img_dir = os.path.join(data_dir, 'training_split', 'training_images')
+    test_img_dir  = os.path.join(data_dir, 'test_split', 'test_images')
 
 
 if __name__ == '__main__':
