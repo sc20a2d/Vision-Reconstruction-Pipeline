@@ -89,9 +89,8 @@ if __name__ == '__main__':
     print("Imports Successful.")
 
 
-    fmri_data, mask = get_fmri("participants_data_v2021/full_track/sub01", "WB")
-    Y_test = np.array(fmri_data[0][:ncell])
-    Y_train = np.array(fmri_data[0][:ncell])
+    lh_fmri = lh_fmri[:image_count]
+    rh_fmri = rh_fmri[:image_count]
 
     # print(fmri_data[0])
 
