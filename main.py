@@ -92,7 +92,12 @@ if __name__ == '__main__':
     lh_fmri = lh_fmri[:image_count]
     rh_fmri = rh_fmri[:image_count]
 
-    # print(fmri_data[0])
+    temp_combined_fmri = np.concatenate((lh_fmri, rh_fmri), axis=1)
+    combined_fmri = []
+    for i in range(image_count):
+        fmri_for_image = temp_combined_fmri[i]
+        mini_fmri_for_image = fmri_for_image[::5]
+        combined_fmri.append(mini_fmri_for_image)
 
     video_dir = 'AlgonautsVideos268_All_30fpsmax'
     video_list = glob.glob(video_dir + '/*.mp4')
