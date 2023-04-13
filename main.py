@@ -118,10 +118,10 @@ if __name__ == '__main__':
 
     print(X_train.shape)
 
-    # tf.convert_to_tensor(X_train, dtype=tf.float32)
-    # tf.convert_to_tensor(X_test, dtype=tf.float32)
-    # tf.convert_to_tensor(Y_test, dtype=tf.float32)
-    # tf.convert_to_tensor(Y_train, dtype=tf.float32)
+    X_train = x_data[:1600]
+    X_test = x_data[400:]
+    Y_train = y_data[:1600]
+    Y_test = y_data[400:]
 
 
     # X_train = np.asarray(X_train).astype(np.float32)
