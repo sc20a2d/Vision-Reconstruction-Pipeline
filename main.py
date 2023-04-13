@@ -88,6 +88,12 @@ def get_fmri(fmri_dir, ROI) -> np.ndarray:
 if __name__ == '__main__':
     print("Imports Successful.")
 
+    # Load and grayscale images
+    image_array = []
+    for i in range(image_count):
+        temp_img = cv2.imread(image_list[i])
+        gray_frame = cv2.cvtColor(temp_img, cv2.COLOR_BGR2GRAY)
+        image_array.append(cv2.resize(gray_frame, (resolution, resolution)))
 
     lh_fmri = lh_fmri[:image_count]
     rh_fmri = rh_fmri[:image_count]
