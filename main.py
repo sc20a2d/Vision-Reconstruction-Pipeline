@@ -173,25 +173,30 @@ if __name__ == '__main__':
     
 
 
-    # # visualization the reconstructed images
-    # X_reconstructed_mu = pred_ae
-    # n = 10
-    # for j in range(1):
-    #     plt.figure(figsize=(12, 2))    
-    #     for i in range(n):
-    #         # display original images
-    #         ax = plt.subplot(2, n, i +j*n*2 + 1)
-    #         plt.imshow(np.rot90(np.fliplr(X_test[i+j*n].reshape(resolution ,resolution ))),cmap='hot')
-    #         ax.get_xaxis().set_visible(False)
-    #         ax.get_yaxis().set_visible(False)
-    #         # display reconstructed images
-    #         ax = plt.subplot(2, n, i + n + j*n*2 + 1)
-    #         #plt.imshow(np.rot90(np.fliplr(X_reconstructed_mu[i+j*n].reshape(resolution ,resolution ))),cmap='hot')
-    #         plt.imshow(np.rot90(np.fliplr(X_reconstructed_mu[i+j*n].reshape(resolution ,resolution ))),cmap='hot')
-    #         ax.get_xaxis().set_visible(False)
-    #         ax.get_yaxis().set_visible(False)
+    # visualization the reconstructed images
+    X_reconstructed_mu = pred_ae
+    n = 8
+    for j in range(1):
+        plt.figure(figsize=(12, 2))    
+        for i in range(n):
+            # display original images
+            ax = plt.subplot(2, n, i +j*n*2 + 1)
+            plt.imshow((np.fliplr(X_test[i+j*n].reshape(resolution ,resolution ))),cmap='gray')
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+            # display reconstructed images
+            ax = plt.subplot(2, n, i + n + j*n*2 + 1)
+            #plt.imshow(np.rot90(np.fliplr(X_reconstructed_mu[i+j*n].reshape(resolution ,resolution ))),cmap='hot')
+            plt.imshow((np.fliplr(X_reconstructed_mu[i+j*n].reshape(resolution ,resolution ))),cmap='gray')
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
 
-    #     plt.show()
-    #     plt.savefig('e2eRec_spk.png', dpi=300)
-
-    # plt.close()
+        plt.show()
+        plt.savefig('e2eRec_spk.png', dpi=300)
+    print("Done!")
+    plt.close()
+    # plot training history
+    plt.plot(history.history['loss'], label='train')
+    plt.plot(history.history['val_loss'], label='test')
+    plt.legend()
+    plt.show()
