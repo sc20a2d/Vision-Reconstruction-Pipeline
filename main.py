@@ -13,9 +13,6 @@ import cv2
 import tensorflow as tf
 
 import glob
-import pickle
-# from sklearn.decomposition import PCA, IncrementalPCA
-from PIL import Image
 from sklearn.model_selection import train_test_split
 from keras import callbacks
 
@@ -142,17 +139,12 @@ if __name__ == '__main__':
     if not os.path.exists(result_dir):
         os.mkdir(result_dir)
 
-    end2end_model.save_weights(os.path.join(weight_dir, 'end2end_digit69_spk.h5'))
+    end2end_model.save_weights(os.path.join(weight_dir, 'model_weights.h5'))
 
-
-    # if not os.path.exists(result_dir):
-    #    os.mkdir(result_dir)
-    np.save(os.path.join(result_dir, 'end2end_digit69_spk.npy'), pred_ae)
+    np.save(os.path.join(result_dir, 'test_predictions.npy'), pred_ae)
     pred_dense_trn, pred_ae_trn = multiout_model.predict(Y_train)
-    np.save(os.path.join(result_dir, 'end2end_digit69_spk_trn.npy'), pred_ae_trn)
+    np.save(os.path.join(result_dir, 'train_predictions.npy'), pred_ae_trn)
     
-
-
     # visualization the reconstructed images
     X_reconstructed_mu = pred_ae
     n = 8
@@ -172,7 +164,6 @@ if __name__ == '__main__':
             ax.get_yaxis().set_visible(False)
 
         plt.show()
-        plt.savefig('e2eRec_spk.png', dpi=300)
     print("Done!")
     plt.close()
     # plot training history
