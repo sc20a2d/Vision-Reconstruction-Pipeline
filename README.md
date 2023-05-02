@@ -21,7 +21,7 @@ Please also download the [Spike Image Decoder](https://github.com/jiankliu/Spike
 ## 1. Cloning Repos and Setting the Right File Structure
 Begin by cloning this repository as well as cloning the [Spike Image Decoder](https://github.com/jiankliu/Spike-Image-Decoder) and downloading the [The Algonauts Project](http://algonauts.csail.mit.edu/challenge.html) dataset (This may take a while depending on your network speed). Clone these projects and set up the file structure as seen above.
 
-Please follow the instructions to install [TensorFlow](https://www.tensorflow.org/install/pip) (newer versions do not support TensorFlow 1) until step 3, do not create a conda environment as this will be done differently.
+Please follow the instructions to install [TensorFlow](https://www.tensorflow.org/install/pip) until step 3, do not create a conda environment as this will be done in the next step.
 
 ## 2. Virtual Environment (optional but highly recommended)
 
