@@ -30,6 +30,27 @@ resolution = 64
 SID_import = __import__("Spike-Image-Decoder.SID")
 SID = getattr(SID_import, "SID")
 
+# Check original Spike-Image Decoder for non-modified cal_performance that works for TensorFlow 1
+# https://github.com/jiankliu/Spike-Image-Decoder
+
+def modified_cal_performance(src_imgs, dst_imgs):
+    src_imgs = src_imgs.astype('float32')
+    dst_imgs = dst_imgs.astype('float32')
+
+    img_num = src_imgs.shape[0]
+    all_mse = np.zeros(img_num)
+    all_psnr = np.zeros(img_num)
+    all_ssim = np.zeros(img_num)
+
+    for i in range(img_num):
+        all_mse[i] = skimage.metrics.mean_squared_error(src_imgs[i], dst_imgs[i])
+        all_psnr[i] = skimage.metrics.peak_signal_noise_ratio(src_imgs[i], dst_imgs[i])
+        all_ssim[i] = skimage.metrics.structural_similarity(src_imgs[i], dst_imgs[i], channel_axis = 2)
+
+    return np.mean(all_mse), np.mean(all_psnr), np.mean(all_ssim)
+
+# Heavily inspired by the original Spike-Image Decoder
+# https://github.com/jiankliu/Spike-Image-Decoder
 
 if __name__ == '__main__':
     print("Imports Successful.")
@@ -114,7 +135,7 @@ if __name__ == '__main__':
 
     multiout_model = tf.keras.Model(input_x, [dense_out, ae_out])
 
-    num_iterations = 3
+    num_iterations = 7
 
     # earlystopping = callbacks.EarlyStopping(monitor="val_loss",
     #                                     mode="min", patience=5, start_from_epoch = 30,
@@ -123,15 +144,15 @@ if __name__ == '__main__':
     for i in range(num_iterations):
         print("iteration: %d"%(i + 1))
         history = end2end_model.fit(Y_train, X_train, 
-                          batch_size = 16, epochs = 3,
+                          batch_size = 16, epochs = 125,
                           validation_data = (Y_test, X_test),
                           callbacks=[] )
          
         pred_dense, pred_ae = multiout_model.predict(Y_test)
 
-        mse, psnr, ssim = SID.cal_performance(X_test, pred_ae)
+        mse, psnr, ssim = modified_cal_performance(X_test, pred_ae)
         print('\nTesting: AE:\tmse:%f psnr:%f ssim:%f'%(mse, psnr, ssim))
-        mse, psnr, ssim = SID.cal_performance(X_train, pred_ae)
+        mse, psnr, ssim = modified_cal_performance(X_train, pred_ae)
         print('\nTraining: AE:\tmse:%f psnr:%f ssim:%f'%(mse, psnr, ssim))
 
     if not os.path.exists(weight_dir):
