@@ -1,62 +1,47 @@
 # Vision Reconstruction Pipeline
 A Python pipeline to recreate a patient's vision from an fMRI dataset
 
-In order to receive the dataset used for this pipeline, please head over to [The Algonauts Project](http://algonauts.csail.mit.edu/2021/challenge.html#DataRelease) website and follow the instructions to download the dataset.
+In order to receive the dataset used for this pipeline, please head over to [The Algonauts Project](http://algonauts.csail.mit.edu/challenge.html) website and follow the instructions to download the dataset.
 
 Please also download the [Spike Image Decoder](https://github.com/jiankliu/Spike-Image-Decoder) so the overall file structure looks like so:
 
 
-    ├── AlgonautsVideos268_All_30fpsmax
-    │   ├── ...mp4
-    │   └── ...mp4
-    ├── participants_data_v2021
-    │   ├── full_track
-    │   │   ├── sub01
-    │   │   ├── ...
-    │   │   └── sub10   
-    │   └── mini_track
-    │       ├── sub01
-    │       ├── ...
-    │       └── sub10 
+    ├── algonauts_2023_tutorial_data
+    │   ├── subj01
+    │   ├── ...
+    │   └── subj08
     ├── Spike-Image-Decoder
     │   └── SID.py
     ├── main.py
     ├── requirements.txt
-    ├── README.md
-    └── venv (will be created after following the commands below)
+    └── README.md
 
 # Intructions to Get Started
 
 ## 1. Cloning Repos and Setting the Right File Structure
-Begin by cloning this repository as well as cloning the [Spike Image Decoder](https://github.com/jiankliu/Spike-Image-Decoder) and downloading the [The Algonauts Project](http://algonauts.csail.mit.edu/2021/challenge.html#DataRelease) dataset (This may take a while depending on your network speed). Clone these projects and set up the file structure as seen above.
+Begin by cloning this repository as well as cloning the [Spike Image Decoder](https://github.com/jiankliu/Spike-Image-Decoder) and downloading the [The Algonauts Project](http://algonauts.csail.mit.edu/challenge.html) dataset (This may take a while depending on your network speed). Clone these projects and set up the file structure as seen above.
 
-Please install [Python 3.7](https://www.python.org/downloads/release/python-370/) (newer versions do not support TensorFlow 1)
+Please follow the instructions to install [TensorFlow](https://www.tensorflow.org/install/pip) until step 3, do not create a conda environment as this will be done in the next step.
 
 ## 2. Virtual Environment (optional but highly recommended)
 
-Setting up a virtual environment is the recommended way to run this pipeline to avoid cluttering your home environment although it is not technically required.
+A conda environment can be created using:
 
-cd to the top level folder of cloned repo and run the command:
+    conda env create -f environment.yml
 
-    python3.7 -m venv venv
+This creates a Python 3.9 environment with the correct packages and package versions
 
-to create a virtual environment using Python 3.7.
+Activate the conda environment by running:
 
-Activate the virtual environment by running:
+    conda activate tf
 
-    source venv/bin/activate
+Deactivate the environment by running:
 
-(Your terminal will likely have "(venv)" before your input)
+    conda deactivate
 
-## 3. Installing The Python Packages
+Your terminal will likely have "(tf)" before your input when you activate the environment.
 
-The repository contains a requirements.txt with the exact versions of packages required for running this project. They can be installed by running:
-
-    pip install -r requirements.txt
-
-This may take a while depending on your network speed.
-
-## 4. Run Pipeline
+## 3. Run Pipeline
 
 After the packages have been installed, the Pipeline can be run by running
 
